@@ -1,10 +1,9 @@
 package main
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 
-	"github.com/gofiber/fiber/middleware"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
@@ -13,14 +12,9 @@ import (
 )
 
 func main() {
-	app := fiber.New()
-	app.Use(cors.New(cors.Config{
-		AllowCredentials: true,
-		AllowOrigins:     "*",
-		AllowHeaders:     "Origin, Content-Type, Accept, Accept-Language, Content-Length",
-	}))
-	app.Use(middleware.Logger())
-	app.Use(middleware.Recover())
+	app := fiber.New(fiber.Config{})
+	app.Use(cors.New(cors.Config{}))
+
 	//app.Use(middleware.CORS())
 
 	db, err := gorm.Open("sqlite3", "test.db")
@@ -31,8 +25,8 @@ func main() {
 
 	db.AutoMigrate(&model.Todo{})
 
-	app.Get("/", func(c *fiber.Ctx) {
-		c.Send("Hello, World!")
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
 	})
 
 	app.Get("/todos", Controllers.GetTodos(db))
