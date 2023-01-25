@@ -20,8 +20,7 @@ func GetTodo(db *gorm.DB) func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		var todo model.Todo
 		if err := db.Where("id = ?", id).First(&todo).Error; err != nil {
-			return c.Status(500).SendString(`err`)
-
+			return c.Status(500).SendString(err.Error())
 		}
 		return c.JSON(todo)
 	}
@@ -31,7 +30,7 @@ func NewTodo(db *gorm.DB) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		var todo model.Todo
 		if err := c.BodyParser(&todo); err != nil {
-			return c.Status(500).SendString(`err`)
+			return c.Status(500).SendString(err.Error())
 
 		}
 		db.Create(&todo)
@@ -45,7 +44,7 @@ func DeleteTodo(db *gorm.DB) func(c *fiber.Ctx) error {
 		var todo model.Todo
 		d := db.Where("id = ?", id).Delete(&todo)
 		fmt.Println(d)
-		return c.SendString("ok")
+		return c.JSON("ok")
 	}
 }
 
@@ -54,11 +53,11 @@ func UpdateTodo(db *gorm.DB) func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		var todo model.Todo
 		if err := db.Where("id = ?", id).First(&todo).Error; err != nil {
-			return c.Status(500).SendString(`err`)
+			return c.Status(500).SendString(err.Error())
 
 		}
 		if err := c.BodyParser(&todo); err != nil {
-			return c.Status(500).SendString(`err`)
+			return c.Status(500).SendString(err.Error())
 
 		}
 		db.Save(&todo)
